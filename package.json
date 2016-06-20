@@ -1,13 +1,12 @@
 {
   "name": "nodemoduler",
   "version": "1.0.0",
-  "description": "nodejs Framework for scalable applications",
   "main": "index.js",
   "author": {
     "name": "Mario Medrano Maldonado",
     "email": "mario.medrano.maldonado@gmail.com"
   },
-  "license": "MIT",
+  "license" : "SEE LICENSE IN LICENSE",
   "keywords": [
     "nodemoduler",
     "framework",
@@ -25,5 +24,14 @@
   ],
   "dependencies": {
     "underscore": "^1.8.3"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "index.js"
+  ],
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/GenDecoder/nodemoduler"
   }
 }

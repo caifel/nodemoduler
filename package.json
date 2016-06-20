@@ -1,0 +1,29 @@
+{
+  "name": "nodemoduler",
+  "version": "1.0.0",
+  "description": "nodejs Framework for scalable applications",
+  "main": "index.js",
+  "author": {
+    "name": "Mario Medrano Maldonado",
+    "email": "mario.medrano.maldonado@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "nodemoduler",
+    "framework",
+    "node",
+    "rest",
+    "restful",
+    "router",
+    "app",
+    "api",
+    "module",
+    "resources",
+    "javascript",
+    "inheritance",
+    "expresive code"
+  ],
+  "dependencies": {
+    "underscore": "^1.8.3"
+  }
+}

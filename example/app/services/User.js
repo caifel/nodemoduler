@@ -9,9 +9,13 @@ module.exports = {
 		var me = this;
 		var newUser = me.userModel(user);
 
-		console.log(user);
-
-		return newUser.save();		
+		return me.userModel.findOne({
+			name: user.name
+		}).then(function (user) {
+			if (user)
+				return 'The user is already register';
+			return newUser.save();
+		});
 	},
 
 	getList: function() {

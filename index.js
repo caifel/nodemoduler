@@ -1,6 +1,6 @@
-module.exports = function(config) {
+module.exports = function(express, config) {
     var _ = require('underscore');
-    var api = require('express').Router();
+    var api = express.Router();
     try {
         var fn;
         var path;
@@ -15,7 +15,7 @@ module.exports = function(config) {
         var folder = process.cwd() + '/' + config.folder + '/';
         var cf = require(folder + 'config');
         var app = require(folder + config.main);
-        var dbOptions = {};
+        var schemaArgs = [];
         var contextualize = function (target, group, route) {
             var scope;
 
@@ -36,7 +36,7 @@ module.exports = function(config) {
                     break;
                 case 'models':
                     path = folder + group + '/' +  route.split('.').join('/');
-                    scope = scopeBook[path] || require(path).schema(dbOptions);
+                    scope = scopeBook[path] || require(path).schema.apply(require(path), schemaArgs);
                     target[require(path)['alias']] = scope;
                     break;
                 case 'mixins':
@@ -109,47 +109,43 @@ module.exports = function(config) {
                 });
             });
         };
+        
+        var initResources = function () {
+            _.each(app.resources, function (config, route) {
+                paths = {};
+                _.extend(paths, app[config.extend]);
+                _.extend(paths, config.paths);
+                paths = _.isEmpty(paths) ? config : paths; //
+                path = folder + 'resources/' + route.split('.').join('/');
+                resource = require(path);
+
+                scopeManager(resource);
+
+                _.each(paths, function (info, test) {
+                    test = (config.base || '') + test;
+                    method = info.split('#')[0].toLowerCase();
+                    fnName = info.split('#')[1];
+                    fn = resource[fnName];
+                    if (_.isFunction(fn)) {
+                        fn = _.bind(fn, resource);
+                        api[method](test, fn);
+                    }
+                });
+            });
+        };
 
         var initialize = function () {
             _.each(scopeBook, function (target) {
                 if (_.has(target, 'init') && _.isFunction(target['init']))
                     target['init']();
             });
-            _.isFunction(app.onAppReady) && app.onAppReady();
+            _.isFunction(app.onModuleReady) && app.onModuleReady();
         };
 
         _.extend(app, cf);
-
-        if (_.isFunction(app.setDBOptions)) {
-            dbOptions = app.setDBOptions();
-            dbOptions = _.isObject(dbOptions) ? dbOptions : {};
-            _.extend(app, dbOptions);
-        }
-
+        _.isFunction(app.setUpDatabase) && app.setUpDatabase(schemaArgs);
         _.has(app, 'middleware') && initMiddleWare();
-
-        _.each(app.resources, function (config, route) {
-            paths = {};
-            _.extend(paths, app[config.extend]);
-            _.extend(paths, config.paths);
-            paths = _.isEmpty(paths) ? config : paths; //
-            path = folder + 'resources/' + route.split('.').join('/');
-            resource = require(path);
-
-            scopeManager(resource);
-
-            _.each(paths, function (info, test) {
-                test = (config.base || '') + test;
-                method = info.split('#')[0].toLowerCase();
-                fnName = info.split('#')[1];
-                fn = resource[fnName];
-                if (_.isFunction(fn)) {
-                    fn = _.bind(fn, resource);
-                    api[method](test, fn);
-                }
-            });
-        });
-
+        _.has(app, 'resources') && initResources();
         initialize();
     } catch (err) {
         console.log(err);

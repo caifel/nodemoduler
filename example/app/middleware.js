@@ -1,6 +1,5 @@
 module.exports = {
-	main: function(req, res, next) {
-		console.log('MAIN MIDDLEWARE');
+	main: function(req, res, next) {		
 		next();
 	}
 };

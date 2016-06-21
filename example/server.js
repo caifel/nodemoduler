@@ -1,10 +1,17 @@
-var express = require('express');
-var nodemoduler = require('nodemoduler');
-var server = express();
+var express 	= require('express');
+var morgan      = require('morgan');
+var bodyParser  = require('body-parser');
+// var nodemoduler = require('nodemoduler');
+var nodemoduler = require('../index');
+var server 		= express();
 
-server.use('/api', nodemoduler({
+server.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
+server.use(morgan('dev'));
+
+server.use('/api', nodemoduler(express, {
 	main: 'init',
-	folder: 'app'
+	folder: 'app'	
 }));
 
 server.listen(3000);

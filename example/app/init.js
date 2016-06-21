@@ -13,16 +13,17 @@ module.exports = {
 		'#main': '*'
 	},
 
-	setDBOptions: function() {
+	setUpDatabase: function(schemaArgs) {
+		var me= this;
 		var mongoose = require('mongoose');
-		mongoose.connect('mongodb://tutorial:tutorial@ds025772.mlab.com:25772/tutorial');
 		
-		return {
-			orm: mongoose
-		};
+		mongoose.connect(me.DB_URL);
+		mongoose.Promise = require('q').Promise;
+
+		schemaArgs.push(mongoose);
 	},
 
-	onAppReady: function() {
+	onModuleReady: function() {
 		console.log('The app is ready, do what you please.');
 	}
 

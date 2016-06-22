@@ -1,6 +1,6 @@
-module.exports = function(express, config) {
+module.exports = function(config) {
     var _ = require('underscore');
-    var api = express.Router();
+    var api = require('express').Router();
     try {
         var fn;
         var path;
@@ -8,14 +8,14 @@ module.exports = function(express, config) {
         var method;
         var fnName;
         var resource;
+        var configFile;
         var intersection;
         var scopeBook = {};
+        var schemaArgs = [];
         var extensionGroups = ['extend', 'mixins'];
         var dependencyGroups = ['models', 'services', 'requires'];
         var folder = process.cwd() + '/' + config.folder + '/';
-        var cf = require(folder + 'config');
-        var app = require(folder + config.main);
-        var schemaArgs = [];
+        var app = require(folder + config.main);        
         var contextualize = function (target, group, route) {
             var scope;
 
@@ -64,7 +64,7 @@ module.exports = function(express, config) {
             if (_.has(scopeBook, path))
                 return false;
 
-            _.extend(target, cf);
+            _.extend(target, configFile);
             scopeBook[path] = target;
 
             _.each(extensionGroups, function (group) {
@@ -109,7 +109,6 @@ module.exports = function(express, config) {
                 });
             });
         };
-        
         var initResources = function () {
             _.each(app.resources, function (config, route) {
                 paths = {};
@@ -133,7 +132,6 @@ module.exports = function(express, config) {
                 });
             });
         };
-
         var initialize = function () {
             _.each(scopeBook, function (target) {
                 if (_.has(target, 'init') && _.isFunction(target['init']))
@@ -142,7 +140,15 @@ module.exports = function(express, config) {
             _.isFunction(app.onModuleReady) && app.onModuleReady();
         };
 
-        _.extend(app, cf);
+        try {
+            configFile = require(folder + 'config');
+        } catch (error) {
+            configFile = {};
+        }
+        if (!_.isObject(configFile))
+            configFile = {};
+
+        _.extend(app, configFile);
         _.isFunction(app.setUpDatabase) && app.setUpDatabase(schemaArgs);
         _.has(app, 'middleware') && initMiddleWare();
         _.has(app, 'resources') && initResources();

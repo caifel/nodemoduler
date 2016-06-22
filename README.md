@@ -25,23 +25,20 @@ It is important to notice that "Moduler" **works side by side with express**, bu
 We start as any application with a **server.js**
 
 ```
-var express = require('express');
-var nodemoduler = require('nodemoduler'); // That's how we include it.
-var server = express();
+var express 	= require('express');
+var morgan      = require('morgan');
+var bodyParser  = require('body-parser');
+var nodemoduler = require('nodemoduler');
+var server 		= express();
 
+server.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
+server.use(morgan('dev'));
 
-server('/api', nodemoduler({
-	main: 'init', // Define the main file.
-	folder: 'app' // Define the folder where lies the module.
+server.use('/api', nodemoduler({
+	main: 'init',
+	folder: 'app'
 }));
-
-/* "Moduler" can be use as many times as modules you have:
-	server('/api', nodemoduler({
-		main: 'init', // Define the main file.
-		folder: 'admin' // Define the folder where lies the module.
-	}));
-	...
-*/
 
 server.listen(3000);
 

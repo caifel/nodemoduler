@@ -3,10 +3,10 @@ module.exports = {
 		'User'
 	],
 
-	signup: function(req, res) {
+	'signup': function(req, res) {
 		var me = this;
 
-		me.userService.createUser(req.body).then(function(response) {
+		me['userService'].createUser(req.body).then(function(response) {
 			response.id ? res.json({
 				success: true,
 				user: response

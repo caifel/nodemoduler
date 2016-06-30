@@ -7,9 +7,9 @@ module.exports = {
 
 	createUser: function(user) {
 		var me = this;
-		var newUser = me.userModel(user);
+		var newUser = me['userModel'](user);
 
-		return me.userModel.findOne({
+		return me['userModel'].findOne({
 			name: user.name
 		}).then(function (user) {
 			if (user)
@@ -21,9 +21,7 @@ module.exports = {
 	getList: function() {
 		var me = this;
 
-		return me.userModel.findAll().then(function(list) {
-			// This is a sample operation, but the goal of using services is to
-			// manage and prepare the data, in order to return it to the resource 
+		return me['userModel'].find({}).then(function(list) {
 			return list.concat([1, 2, 3]); 
 		});
 	}

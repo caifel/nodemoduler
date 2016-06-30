@@ -4,7 +4,7 @@ module.exports = {
 			'/auth/signup': 'POST#signup',
 		},
 		'User': {
-			'/user/list': 'POST#getList',
+			'/user/list': 'GET#getList',
 			'/user/get/:id': 'GET#getById',
 		}
 	},

@@ -2,10 +2,12 @@ module.exports = {
 	resources: {
 		'Auth': {
 			'/auth/signup': 'POST#signup',
+			'/auth/login': 'POST#login',
+			'/auth/facebook': 'POST#facebookAth'
 		},
 		'User': {
 			'/user/list': 'GET#getList',
-			'/user/get/:id': 'GET#getById',
+			'/user/get/:id': 'GET#getById'
 		}
 	},
 

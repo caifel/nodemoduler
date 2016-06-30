@@ -23,13 +23,7 @@ module.exports = {
 			});
 		});
 
-		me.passport.use(new me.FacebookStrategy({
-			// pull in our app id and secret from our auth.js file
-			clientID        : configAuth.facebookAuth.clientID,
-			clientSecret    : configAuth.facebookAuth.clientSecret,
-			callbackURL     : configAuth.facebookAuth.callbackURL
-
-		}, function(token, refreshToken, profile, done) {
+		me.passport.use(new me.FacebookStrategy(me.facebookAuth, function(token, refreshToken, profile, done) {
 			// asynchronous
 			process.nextTick(function() {
 				// find the user in the database based on their facebook id
@@ -69,12 +63,12 @@ module.exports = {
 	},
 
 	main: function(req, res, next) {
-		var me = this;
-
-		next();
+		res.status(500).send({
+			error: 'token_absent'
+		});
 	},
 
-	authLogin: function () { // /auth/facebook
+	facebookAuth: function () {
 		var me = this;
 
 		me.passport.authenticate('facebook', {

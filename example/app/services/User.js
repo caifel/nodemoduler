@@ -24,6 +24,12 @@ module.exports = {
 		return me['userModel'].find({}).then(function(list) {
 			return list.concat([1, 2, 3]); 
 		});
+	},
+	
+	getUser: function (id) {
+		var me = this;
+		
+		return me['userModel'].findById(id);
 	}
 
 };

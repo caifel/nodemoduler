@@ -15,5 +15,11 @@ module.exports = {
 				message: response
 			});
 		});
+	},
+	
+	'login': function (req, res) {
+		res.json({
+			name: 'mario'
+		});
 	}
 };

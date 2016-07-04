@@ -3,7 +3,7 @@ module.exports = {
 		'Auth': {
 			'/auth/signup': 'POST#signup',
 			'/auth/login': 'POST#login',
-			'/auth/facebook': 'POST#facebookAth'
+			'/auth/google': 'POST#googleAuth'
 		},
 		'User': {
 			'/user/list': 'GET#getList',
@@ -12,7 +12,11 @@ module.exports = {
 	},
 
 	middleware: {
-		'#main': '*'
+		'#authentication': {
+			exceptTo: [
+				'/auth/google'
+			]
+		}
 	},
 
 	setUpDatabase: function(schemaArgs) {

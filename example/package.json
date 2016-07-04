@@ -4,15 +4,16 @@
   "main": "server.js",
   "private": true,
   "dependencies": {
+    "bcryptjs": "^2.3.0",
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
+    "jwt-simple": "^0.5.0",
+    "moment": "^2.14.1",
     "mongoose": "^4.5.1",
     "morgan": "^1.7.0",
     "nodemoduler": "^1.0.3",
-    "passport": "^0.3.2",
-    "passport-facebook": "^2.1.1",
-    "passport-local": "^1.0.0",
     "q": "^1.4.1",
+    "request": "^2.72.0",
     "sequelize": "^3.23.3"
   }
 }

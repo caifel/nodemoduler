@@ -1,9 +1,5 @@
 module.exports = {
     DB_URL: 'mongodb://tutorial:tutorial@ds025772.mlab.com:25772/tutorial',
-
-    facebookAuth: {
-        clientID: '233437867039519',
-        clientSecret: '808fc9d56e44c9cdc4c2213dd7ee97be',
-        callbackURL: '4'
-    }
+    GOOGLE_AUTH_SECRET: 'k3rYXJuPzJIXwhiKwF2wFGoA',
+    SECRET_TOKEN: 'THIS_IS_MY_SECRET_TOKEN_5500'
 };

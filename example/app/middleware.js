@@ -10,11 +10,15 @@ module.exports = {
 		me.jwt = require('jwt-simple');
 	},
 
-	authentication: function (req, res, next) {
+	upload: function (req, res, next) {
+		next();
+	},
+
+	auth: function (req, res, next) {
 		var me = this;
 		var payload = null;
 		var authorization = req.header('Authorization');
-
+	
 		if (!authorization)
 			return res.status(401).send({
 				message: 'Please make sure your request has an Authorization header'

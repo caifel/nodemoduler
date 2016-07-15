@@ -1,7 +1,6 @@
 module.exports = {
-	services: [
-		'User'
-	],
+	model: [ 'User' ],
+	service: [ 'User' ],
 
 	'getList': function(req, res) {
 		var me = this;

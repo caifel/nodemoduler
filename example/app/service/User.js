@@ -1,9 +1,13 @@
 module.exports = {
 	alias: 'userService',
 
-	models: [
+	model: [
 		'User'
 	],
+	
+	init: function () {
+		console.log('You are in User Service');	
+	},
 
 	createUser: function(user) {
 		var me = this;

@@ -1,19 +1,17 @@
 module.exports = function(config) {
+    var api = config.router;
     var _ = require('underscore');
-    var api = require('express').Router();
     try {
         var fn;
         var path;
-        var paths;
         var method;
         var fnName;
         var resource;
-        var configFile;
         var intersection;
         var scopeBook = {};
         var schemaArgs = [];
-        var extensionGroups = ['extend', 'mixins'];
-        var dependencyGroups = ['models', 'services', 'requires'];
+        var extensionGroups = ['extend', 'mixin'];
+        var dependencyGroups = ['model', 'service', 'require'];
         var folder = process.cwd() + '/' + config.folder + '/';
         var app = require(folder + config.main);        
         var contextualize = function (target, group, route) {
@@ -34,23 +32,23 @@ module.exports = function(config) {
                     });
                     _.extend(target, _.omit(scope, intersection));
                     break;
-                case 'models':
+                case 'model':
                     path = folder + group + '/' +  route.split('.').join('/');
                     scope = scopeBook[path] || require(path).schema.apply(require(path), schemaArgs);
                     target[require(path)['alias']] = scope;
                     break;
-                case 'mixins':
+                case 'mixin':
                     path = folder + group + '/' + route.split('.').join('/');
                     scope = scopeBook[path] || require(path);
                     intersection = _.intersection(_.functions(scope), _.functions(target));
                     _.extend(target, _.omit(scope, intersection));
                     break;
-                case 'services':
+                case 'service':
                     path = folder + group + '/' + route.split('.').join('/');
                     scope = scopeBook[path] || require(path);
                     target[scope['alias']] = scope;
                     break;
-                case 'requires':
+                case 'require':
                     path = folder + route.split('.').join('/');
                     scope = scopeBook[path] || require(path);
                     target[scope['alias']] = scope;
@@ -63,8 +61,6 @@ module.exports = function(config) {
         var scopeManager = function(target) {
             if (_.has(scopeBook, path))
                 return false;
-
-            _.extend(target, configFile);
             scopeBook[path] = target;
 
             _.each(extensionGroups, function (group) {
@@ -78,9 +74,7 @@ module.exports = function(config) {
                 });
                 delete target[group];
             });
-
-            delete target['alias'];
-        };
+        };        
         var initMiddleWare = function () {
             var middleware = require(folder + 'middleware');
             scopeManager(middleware);
@@ -94,13 +88,14 @@ module.exports = function(config) {
                 api.use(function (req, res, next) {
                     var findFn = function (route) {
                         route = route.trim();
-                        var isSensitive = _.indexOf(route, '*') > - 1;
+                        var inSensitive = _.indexOf(route, '*') > - 1;
                         route = route.replace(/^\**/, '').replace(/(:[^\/]*)/g, '.\\S*');
-                        return new RegExp(route + (isSensitive ? '' : '$')).test((req.url).split('?')[0]);
+                        return new RegExp(route + (inSensitive ? '' : '$')).test((req.url).split('?')[0]);
                     };
                     if (
                         (_.has(cd, at) && _.find(_.isString(cd[at]) ? [cd[at]] : cd[at], findFn)) ||
                         (_.has(cd, et) && !_.find(_.isString(cd[et]) ? [cd[et]] : cd[et], findFn)) ||
+                        (_.isString(cd) && (cd[0] === '-' && !findFn(cd.split('-')[1]))) ||
                         (_.isString(cd) && (_.isEqual(cd, '*') || findFn(cd)))
                     )
                         wall(req, res, next);
@@ -110,48 +105,35 @@ module.exports = function(config) {
             });
         };
         var initResources = function () {
-            _.each(app.resources, function (config, route) {
-                paths = {};
-                _.extend(paths, app[config.extend]);
-                _.extend(paths, config.paths);
-                paths = _.isEmpty(paths) ? config : paths; //
-                path = folder + 'resources/' + route.split('.').join('/');
-                resource = require(path);
-
+            _.each(app.resource, function (refs, route) {
+                path = folder + 'resource/' + route.split('.').join('/');
+                resource = require(path);                
                 scopeManager(resource);
 
-                _.each(paths, function (info, test) {
-                    test = (config.base || '') + test;
-                    method = info.split('#')[0].toLowerCase();
+                _.each(refs, function (info, src) {
                     fnName = info.split('#')[1];
+                    method = info.split('#')[0].toLowerCase();
                     fn = resource[fnName];
                     if (_.isFunction(fn)) {
                         fn = _.bind(fn, resource);
-                        api[method](test, fn);
+                        api[method](src, fn);
                     }
                 });
             });
         };
         var initialize = function () {
+            _.isFunction(app.ready) && app.ready();
             _.each(scopeBook, function (target) {
-                if (_.has(target, 'init') && _.isFunction(target['init']))
-                    target['init']();
-            });
-            _.isFunction(app.onModuleReady) && app.onModuleReady();
+                target._ = _;
+                delete target['alias'];
+                _.extend(target, app.global || {});
+                _.has(target, 'init') && _.isFunction(target['init']) && target['init']();
+            });            
         };
-
-        try {
-            configFile = require(folder + 'config');
-        } catch (error) {
-            configFile = {};
-        }
-        if (!_.isObject(configFile))
-            configFile = {};
-
-        _.extend(app, configFile);
-        _.isFunction(app.setUpDatabase) && app.setUpDatabase(schemaArgs);
+        _.extend(app, app.global || {});
+        _.isFunction(app.setupDB) && app.setupDB(schemaArgs);
         _.has(app, 'middleware') && initMiddleWare();
-        _.has(app, 'resources') && initResources();
+        _.has(app, 'resource') && initResources();
         initialize();
     } catch (err) {
         console.log(err);

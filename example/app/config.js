@@ -1,5 +1,5 @@
 module.exports = {
-    DB_URL: 'mongodb://tutorial:tutorial@ds025772.mlab.com:25772/tutorial',
+    SECRET_TOKEN: 'THIS_IS_MY_SECRET_TOKEN_5500',
     GOOGLE_AUTH_SECRET: 'k3rYXJuPzJIXwhiKwF2wFGoA',
-    SECRET_TOKEN: 'THIS_IS_MY_SECRET_TOKEN_5500'
+    DB_URL: 'mongodb://tutorial:tutorial@ds025772.mlab.com:25772/tutorial'
 };

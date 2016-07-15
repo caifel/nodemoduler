@@ -1,8 +1,8 @@
 module.exports = {
-	models: [
+	model: [
 		'User'
 	],
-	services: [
+	service: [
 		'User'
 	],
 

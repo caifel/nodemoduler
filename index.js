@@ -10,10 +10,9 @@ module.exports = function(config) {
         var intersection;
         var scopeBook = {};
         var schemaArgs = [];
-        var extensionGroups = ['extend', 'mixin'];
-        var dependencyGroups = ['model', 'service', 'require'];
         var folder = process.cwd() + '/' + config.folder + '/';
-        var app = require(folder + config.main);        
+        var keyWords = ['extend', 'mixin', 'service', 'require', 'model'];
+        var app = require(folder + config.main);
         var contextualize = function (target, group, route) {
             var scope;
 
@@ -34,8 +33,9 @@ module.exports = function(config) {
                     break;
                 case 'model':
                     path = folder + group + '/' +  route.split('.').join('/');
-                    scope = scopeBook[path] || require(path).schema.apply(require(path), schemaArgs);
-                    target[require(path)['alias']] = scope;
+                    scope = scopeBook[path] || require(path);
+                    target[scope['alias']] = scope;
+                    scope.isModel = true;
                     break;
                 case 'mixin':
                     path = folder + group + '/' + route.split('.').join('/');
@@ -63,15 +63,13 @@ module.exports = function(config) {
                 return false;
             scopeBook[path] = target;
 
-            _.each(extensionGroups, function (group) {
-                contextualize(target, group, target[group]);
-                delete target[group];
-            });
-
-            _.each(dependencyGroups, function (group) {
-                _.each(target[group], function (route) {
-                    contextualize(target, group, route)
-                });
+            _.each(keyWords, function (group) {
+                if (_.isArray(target[group]))
+                    _.each(target[group], function (route) {
+                        contextualize(target, group, route)
+                    });
+                else
+                    contextualize(target, group, target[group]);
                 delete target[group];
             });
         };        
@@ -127,6 +125,13 @@ module.exports = function(config) {
                 target._ = _;
                 delete target['alias'];
                 _.extend(target, app.global || {});
+                if (target.isModel) {
+                    delete target.isModel;
+                    if (_.isFunction(target.schema))
+                        _.extend(target, target.schema.apply(target, schemaArgs));
+                    else
+                        console.warn('All models must have an schema method');
+                }
                 _.has(target, 'init') && _.isFunction(target['init']) && target['init']();
             });            
         };

@@ -1,9 +1,7 @@
 module.exports = {
 	alias: 'userService',
-
-	model: [
-		'User'
-	],
+	model: [ 'User' ],
+	mixin: [ 'Calculation' ],
 	
 	init: function () {
 		console.log('You are in User Service');	

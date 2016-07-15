@@ -3,6 +3,8 @@ var bcrypt = require('bcryptjs'); // SHOULD BE POSSIBLE TO HAVE AN INIT IN THE M
 module.exports = {
 	alias: 'userModel',
 
+	mixin: [ 'Calculation' ],
+
 	schema: function(mongoose) {
 		var schema = mongoose.Schema({
 			email: {

@@ -1,5 +1,5 @@
 module.exports = {
-	models: [
+	model: [
 		'User'
 	],
 

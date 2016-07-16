@@ -1,7 +1,5 @@
 module.exports = {
-	model: [
-		'User'
-	],
+	model: [ 'User' ],
 
 	init: function () {
 		var me = this;

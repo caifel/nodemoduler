@@ -7,6 +7,7 @@ module.exports = function(config) {
         var method;
         var fnName;
         var resource;
+        var schemas = {};
         var intersection;
         var scopeBook = {};
         var schemaArgs = [];
@@ -34,8 +35,9 @@ module.exports = function(config) {
                 case 'model':
                     path = folder + group + '/' +  route.split('.').join('/');
                     scope = scopeBook[path] || require(path);
-                    target[scope['alias']] = scope;
-                    scope.isModel = true;
+                    target._schemas = target._schemas || [];
+                    target._schemas.push(scope['alias']);
+                    scope._isModel = true;
                     break;
                 case 'mixin':
                     path = folder + group + '/' + route.split('.').join('/');
@@ -74,7 +76,8 @@ module.exports = function(config) {
             });
         };        
         var initMiddleWare = function () {
-            var middleware = require(folder + 'middleware');
+            path = folder + 'middleware';
+            var middleware = require(path);
             scopeManager(middleware);
 
             _.each(app['middleware'], function (cd, wallMethod) {
@@ -120,21 +123,58 @@ module.exports = function(config) {
             });
         };
         var initialize = function () {
-            _.isFunction(app.ready) && app.ready();
-            _.each(scopeBook, function (target) {
+            /**
+             * Step 1:
+             *      Loop throw everything provide each one with "underscore"
+             *      and with all properties defined in "global".
+             * */
+            _.each(scopeBook, function (target, path) {
                 target._ = _;
-                delete target['alias'];
                 _.extend(target, app.global || {});
-                if (target.isModel) {
-                    delete target.isModel;
+                /**
+                 * If the target is a model then the schema method is executed in order to
+                 * obtain the expected object that will be passed to all who need it.
+                 * */
+                if (target._isModel) {
+                    delete target._isModel;
+                    delete scopeBook[path];
                     if (_.isFunction(target.schema))
-                        _.extend(target, target.schema.apply(target, schemaArgs));
+                        /**
+                         * Temporarily the "model" is keep in the "schemas" array
+                         * */
+                        schemas[target['alias']] = target.schema.apply(target, schemaArgs);
                     else
-                        console.warn('All models must have an schema method');
+                        console.error('The model: "' + target['alias'] + '" does not have an schema method');
+                    delete target['alias'];
                 }
-                _.has(target, 'init') && _.isFunction(target['init']) && target['init']();
-            });            
+            });
+            /**
+             * Step 2:
+             *      Pass the schema(s) to all those who have required it.
+             * */
+            _.each(scopeBook, function (target) {
+                if (_.has(target, '_schemas')) {
+                    _.each(target._schemas, function (ref) {
+                        target[ref] = schemas[ref];
+                    });
+                    delete target._schemas;
+                }
+            });
+            schemas = {}; /** No longer needed */
+            /**
+             * Once models were correctly injected
+             * "nodemoduler" have finished to setup the module.
+             * */
+            _.isFunction(app.ready) && app.ready();
+            /**
+             * Step 3:
+             *      "Init" method of all those who have it is executed.
+             * */
+            _.each(scopeBook, function (target) {
+                _.isFunction(target['init']) && target['init']();
+            });
         };
+
         _.extend(app, app.global || {});
         _.isFunction(app.setupDB) && app.setupDB(schemaArgs);
         _.has(app, 'middleware') && initMiddleWare();

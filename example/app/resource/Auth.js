@@ -1,10 +1,6 @@
 module.exports = {
-	model: [
-		'User'
-	],
-	service: [
-		'User'
-	],
+	model: [ 'User' ],
+	service: [ 'User' ],
 
 	init: function() {
 		var me = this;

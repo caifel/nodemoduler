@@ -1,8 +1,7 @@
-var bcrypt = require('bcryptjs'); // SHOULD BE POSSIBLE TO HAVE AN INIT IN THE MODEL
+var bcrypt = require('bcryptjs');
 
 module.exports = {
 	alias: 'userModel',
-
 	mixin: [ 'Calculation' ],
 
 	schema: function(mongoose) {

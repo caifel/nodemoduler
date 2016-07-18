@@ -3,6 +3,7 @@ module.exports = {
 		'Auth': {
 			'/auth/login': 'POST#login',
 			'/auth/signup': 'POST#signup',
+			'/auth/github': 'POST#githubAuth',
 			'/auth/google': 'POST#googleAuth'
 		},
 		'User': {
@@ -31,16 +32,17 @@ module.exports = {
 	 *				can be explicit, with params and/or insensitive (same for all).
 	 * */
 	middleware: {
-		'#auth': '-auth*',
-		'#upload': 'upload*'
+		'#auth': '-auth*'
 	},
-
+	
 	/**
 	 * The keys - values defined in "global" are going to be available
 	 * inside the scope of every resource, service, model or require.
 	 * */
 	global: {
-		Promise: require('q').Promise,
+		q: require('q').Promise,
+		moment: require('moment'),
+		jwt: require('jwt-simple'),
 		_CONFIG: require('./config')
 	},
 
@@ -59,13 +61,13 @@ module.exports = {
 		var mongoose = require('mongoose');
 		
 		mongoose.connect(me._CONFIG.DB_URL);
-		mongoose.Promise = me.Promise;
+		mongoose.Promise = me.q;
 
 		schemaArgs.push(mongoose);
 	},
 
 	/**
-	 * Callback called when "moduler" have finished setting up everything
+	 * Callback called when "nodemoduler" have finished setting up everything
 	 * Consider that "ready" is call before all the init methods.
 	 * 			"Every resource, service, model,
 	 * 		and/or require can have an "init" method"

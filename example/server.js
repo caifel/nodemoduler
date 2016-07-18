@@ -4,6 +4,7 @@ var moduler = require('../index');
 var bodyParser  = require('body-parser');
 var server 		= express();
 
+server.use(express.static('public'));
 server.use(bodyParser.urlencoded({
 	extended: true
 }));

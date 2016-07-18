@@ -42,6 +42,7 @@ module.exports = function(config) {
                 case 'mixin':
                     path = folder + group + '/' + route.split('.').join('/');
                     scope = scopeBook[path] || require(path);
+                    //scope._isMixin = true;
                     intersection = _.intersection(_.functions(scope), _.functions(target));
                     _.extend(target, _.omit(scope, intersection));
                     break;
@@ -147,6 +148,13 @@ module.exports = function(config) {
                         console.error('The model: "' + target['alias'] + '" does not have an schema method');
                     delete target['alias'];
                 }
+                /**
+                 * Mixin can have an init method, but it won't be executed at the start.
+                 * */
+                /*if (target._isMixin) {
+                    delete target._isMixin;
+                    delete scopeBook[path];
+                }*/
             });
             /**
              * Step 2:

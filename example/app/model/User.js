@@ -2,7 +2,6 @@ var bcrypt = require('bcryptjs');
 
 module.exports = {
 	alias: 'userModel',
-	mixin: [ 'Calculation' ],
 
 	schema: function(mongoose) {
 		var schema = mongoose.Schema({
@@ -33,6 +32,23 @@ module.exports = {
 				});
 			});
 		});
+
+		schema.methods.saveWithProvider = function(data, provider) {
+			var me = this;
+			
+			if (provider === 'google') {
+				me.google = data.sub;
+				me.displayName = me.displayName || data.name;
+				me.picture = me.picture || data.picture.replace('sz=50', 'sz=200');
+			}
+			if (provider === 'github') {
+				me.github = data.id;
+				me.picture = me.picture || data.avatar_url;
+				me.displayName = me.displayName || data.name;
+			}
+
+			return me.save();
+		};
 
 		schema.methods.comparePassword = function(password, done) {
 			bcrypt.compare(password, this.password, function(err, isMatch) {

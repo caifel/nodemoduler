@@ -1,0 +1,14 @@
+body {
+    color: #000;
+    margin: 0 auto;
+    overflow-x: hidden;
+    border: solid 15px;
+    letter-spacing: 1px;
+    border-color: #141414;    
+    border-top-width: 40px;
+    border-bottom-width: 40px;
+  	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  	-webkit-user-select: none;  /* Chrome all / Safari all */
+  	-moz-user-select: none;     /* Firefox all */
+  	-ms-user-select: none;      /* IE 10+ */  
+}

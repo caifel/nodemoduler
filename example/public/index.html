@@ -1,0 +1,31 @@
+<html ng-app = "app">
+<head>
+	<title>ANGULAR 1 BOILER PLATE</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">	
+</head>
+<body ng-controller = "UserCtrl">
+	<button
+		ng-click = "socialAuth('google');"
+		class = "btn btn-danger"
+	> GOOGLE </button>
+
+	<button
+		ng-click = "socialAuth('github');"
+		class = "btn btn-warning"
+	> GITHUB </button>
+
+
+
+	<button
+		ng-click = "logout();"
+		class = "btn btn-default"
+	> LOG OUT </button>
+
+	<script src = "lib/angular.min.js"></script>
+	<script src = "lib/satellizer.min.js"></script>
+
+	<script src = "js/app.js"></script>
+	<script src = "js/controllers/User.js"></script>
+</body>
+</html>

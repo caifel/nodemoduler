@@ -118,6 +118,35 @@ module.exports = {
 			});
 		};
 
+		// Never should come here if the authorization exists and is valid.
+		// Because of the initial validation in UI and "auth" middleware.
+
+		// Consequence, the welcome or log-in/sign-up pages are not going
+		// to be reachable while an authorization get exists and is valid.
+		// LOOK a way to make welcome page reachable anyway (it depends of the type of app)
+
+		// A user can only use ONE provider, so to query
+		// by provider is not realistic neither correct.
+
+		// So by priority the question is:
+		// ¿Does the "email" that I want to register already exists?
+		// 		If it does exists, then I return JUST the token.
+		// 			Then the UI app will be reset, the isAuthenticated will be "true"
+		// 			The getMe service will be called successfully because the middleware will accept the token.
+		// 		If it does NOT exists, then I create the user and return the token.
+		//			Then, same as before
+		// ¿Why must I look for "provider"?
+		//		If you try to log-in or sign-up with google for example;
+		//		and the EMAIL IS FOUND, an we verify that the account is linked with "google" (same provider)
+		//		then we benefit of this to update the information.
+		//
+		//		But if the provider of our account is different than the one
+		//		being use, then we refuse it, and send a message saying, that
+		//		the email that he/she wanna use is in use and/or linked with a provider "XXX"
+
+		// So a field provider is gonna be need, and this will be an String (Google, Facebook ...)
+
+
 		if (req.header('Authorization')) {
 			token = req.header('Authorization').split(' ')[1];
 			payload = me.jwt.decode(token, me._CONFIG.SECRET_TOKEN);
@@ -144,24 +173,26 @@ module.exports = {
 		}, failFn);
 	},
 
-	'sigpup': function(req, res) {
+	'signup': function(req, res) {
 		var me = this;
 		var User = me['userModel'];
 
-		User.findOne({ email: req.body.email }, function(err, existingUser) {
-			if (existingUser) {
+		User.findOne({
+			email: req.body.email
+		}).then( function(user) {
+			if (user)
 				return res.status(409).send({ message: 'Email is already taken' });
-			}
-			var user = new User({
+			user = new User({
 				email: req.body.email,
 				password: req.body.password
 			});
-			user.save(function(err, result) {
-				if (err) {
-					res.status(500).send({ message: err.message });
-				}
+			user.save().then(function(result) {
 				res.send({ token: me.createJWT(result) });
+			}, function (error) {
+				res.status(500).send({ message: error.message });
 			});
+		}, function (error) {
+			res.status(500).send({ message: error.message });
 		});
 	},
 

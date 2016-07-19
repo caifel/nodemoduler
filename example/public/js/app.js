@@ -11,4 +11,7 @@ app.config(function($authProvider) {
 		url: '/api/auth/github',
 		clientId: '8eaa4268af655492d0d7'
 	});
+
+	$authProvider.loginUrl = '/api/auth/login';
+	$authProvider.signupUrl = '/api/auth/signup';
 });

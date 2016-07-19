@@ -11,5 +11,13 @@ app.controller('UserCtrl', ['$scope', '$auth', function($scope, $auth) {
 	
 	$scope.logout = function () {
 		$auth.logout();
-	}
+	};
+	
+	$scope.login = function () {
+		$auth.login($scope.user);	
+	};
+
+	$scope.signup = function () {
+		$auth.signup($scope.user);
+	};
 }]);

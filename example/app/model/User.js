@@ -22,12 +22,12 @@ module.exports = {
 		});
 
 		schema.pre('save', function(next) {
-			var user = this;
-			if (!user.isModified('password'))
+			var me = this;
+			if (!me.isModified('password'))
 				return next();
 			bcrypt.genSalt(10, function(err, salt) {
-				bcrypt.hash(user.password, salt, function(err, hash) {
-					user.password = hash;
+				bcrypt.hash(me.password, salt, function(err, hash) {
+					me.password = hash;
 					next();
 				});
 			});

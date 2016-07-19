@@ -146,10 +146,12 @@ module.exports = {
 
 		// So a field provider is gonna be need, and this will be an String (Google, Facebook ...)
 
+		// Anyway in the model or here the should exists the support for the different type of login, providers
 
-		if (req.header('Authorization')) {
-			token = req.header('Authorization').split(' ')[1];
-			payload = me.jwt.decode(token, me._CONFIG.SECRET_TOKEN);
+
+		if (req.header('Authorization')) { //
+			token = req.header('Authorization').split(' ')[1]; //
+			payload = me.jwt.decode(token, me._CONFIG.SECRET_TOKEN); //
 		}
 
 		if (profile) {
@@ -158,6 +160,32 @@ module.exports = {
 
 			profile.email && filters.push({ 'email': profile.email });
 		}
+
+
+		/**
+		 * This will be the new logic
+		 * */
+		User.findOne({
+			email: profile.email
+		}).then(function (user) {
+			if (!user) {
+				// Then create user.
+				// return the token.
+			}
+
+			if (user.provider === provider) {
+				// Update Information (Each provider has its own support).
+				// return the token.
+			}
+
+			if (user.provider !== provider) {
+				// Send message (email already registered and linked with a provider "XXX")
+				// Do not return the token.
+			}
+		});
+		/**
+		 * This will be the new logic
+		 * */
 		
 		payload && payload.sub && filters.push({ '_id': payload.sub });
 

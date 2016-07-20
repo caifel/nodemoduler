@@ -4,7 +4,8 @@ module.exports = {
 			'/auth/login': 'POST#login',
 			'/auth/signup': 'POST#signup',
 			'/auth/github': 'POST#githubAuth',
-			'/auth/google': 'POST#googleAuth'
+			'/auth/google': 'POST#googleAuth',
+			'/auth/facebook': 'POST#facebookAuth'
 		},
 		'User': {
 			'/user/list': 'GET#getList',
